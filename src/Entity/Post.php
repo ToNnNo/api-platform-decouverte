@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
@@ -26,8 +27,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
             normalizationContext: ['groups' => 'read:post:collection']
         ),
         new \ApiPlatform\Metadata\Post(),
-        new Put(),
-        new Patch(),
+        new Put(
+            validationContext: ['groups' => ['Default', 'validation:post:update']]
+        ),
+        new Patch(
+            validationContext: ['groups' => ['Default', 'validation:post:update']]
+        ),
         new Delete()
     ],
     normalizationContext: ['groups' => 'read:post:item'],
@@ -44,6 +49,7 @@ class Post
      */
     #[ORM\Column(length: 255)]
     #[Groups(['read:post:collection', 'read:post:item', 'write:post:item'])]
+    #[Assert\NotBlank()]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -52,6 +58,7 @@ class Post
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['read:post:item', 'write:post:item'])]
+    #[Assert\NotBlank(groups: ['validation:post:update'])]
     private ?string $content = null;
 
     #[ORM\Column]
