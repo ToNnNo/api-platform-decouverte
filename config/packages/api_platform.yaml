@@ -1,0 +1,11 @@
+api_platform:
+    title: Découverte API Platform
+    version: 1.0.1
+    description: Ceci est un test de description de l'api
+    # Good defaults for REST APIs
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            standard_put: true
