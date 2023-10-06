@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -38,6 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => 'read:post:item'],
     denormalizationContext: ['groups' => 'write:post:item']
 )]
+// #[ApiFilter(SearchFilter::class, properties: ['title' => 'partial'])]
 class Post
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
@@ -50,6 +53,7 @@ class Post
     #[ORM\Column(length: 255)]
     #[Groups(['read:post:collection', 'read:post:item', 'write:post:item'])]
     #[Assert\NotBlank()]
+    #[ApiFilter(SearchFilter::class, strategy: 'word_start')]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
