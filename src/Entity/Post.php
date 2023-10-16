@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Put;
 use App\Repository\PostRepository;
+use App\State\PostStateProcessor;
 use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,10 +31,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new \ApiPlatform\Metadata\Post(),
         new Put(
-            validationContext: ['groups' => ['Default', 'validation:post:update']]
+            validationContext: ['groups' => ['Default', 'validation:post:update']],
+            processor: PostStateProcessor::class
         ),
         new Patch(
-            validationContext: ['groups' => ['Default', 'validation:post:update']]
+            validationContext: ['groups' => ['Default', 'validation:post:update']],
+            processor: PostStateProcessor::class
         ),
         new Delete()
     ],
@@ -75,6 +78,10 @@ class Post
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[Groups(['read:post:collection', 'read:post:item', 'write:post:item'])]
     private ?Category $category = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    #[Groups(['read:post:collection', 'read:post:item', 'write:post:item'])]
+    private ?bool $published = false;
 
     public function __construct()
     {
@@ -161,6 +168,18 @@ class Post
     public function setCategory(?Category $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    public function isPublished(): ?bool
+    {
+        return $this->published;
+    }
+
+    public function setPublished(bool $published): static
+    {
+        $this->published = $published;
 
         return $this;
     }
